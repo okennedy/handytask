@@ -9,7 +9,6 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
-
     # This will be in the windows group and have the "win" prefix
     max_action = Gio.SimpleAction.new_stateful("maximize", None,
                                        GLib.Variant.new_boolean(False))
@@ -31,12 +30,22 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     self.scroller.add(self.task_view)
     self.task_view.show()
 
+    done_toggle_renderer = Gtk.CellRendererToggle()
+    done_toggle_renderer.connect("toggled", self.on_done_toggled)
     self.task_view.append_column(
-      Gtk.TreeViewColumn("Task", Gtk.CellRendererText(), text = tasklist.TITLE_COLUMN)
+      Gtk.TreeViewColumn("✓", done_toggle_renderer, active = tasklist.COMPLETED_COLUMN)
     )
+
+    self.task_view.append_column(
+      Gtk.TreeViewColumn("Task", Gtk.CellRendererText(), text = tasklist.ELLIPSIZED_TITLE_COLUMN)
+    )
+
     self.task_view.append_column(
       Gtk.TreeViewColumn("Due", Gtk.CellRendererText(), text = tasklist.DUE_COLUMN)
     )
+
+  def on_done_toggled(self, action, value):
+    self.tasks.toggle_done(int(value))
 
   def on_maximize_toggle(self, action, value):
       action.set_state(value)

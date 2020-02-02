@@ -9,24 +9,6 @@ MENU_XML="""
 <interface>
   <menu id="app-menu">
     <section>
-      <attribute name="label" translatable="yes">Change label</attribute>
-      <item>
-        <attribute name="action">win.change_label</attribute>
-        <attribute name="target">String 1</attribute>
-        <attribute name="label" translatable="yes">String 1</attribute>
-      </item>
-      <item>
-        <attribute name="action">win.change_label</attribute>
-        <attribute name="target">String 2</attribute>
-        <attribute name="label" translatable="yes">String 2</attribute>
-      </item>
-      <item>
-        <attribute name="action">win.change_label</attribute>
-        <attribute name="target">String 3</attribute>
-        <attribute name="label" translatable="yes">String 3</attribute>
-      </item>
-    </section>
-    <section>
       <item>
         <attribute name="action">win.maximize</attribute>
         <attribute name="label" translatable="yes">Maximize</attribute>
@@ -72,12 +54,16 @@ class HandyTaskApplication(Gtk.Application):
         builder = Gtk.Builder.new_from_string(MENU_XML, -1)
         self.set_app_menu(builder.get_object("app-menu"))
 
+
     def do_activate(self):
         # We only allow a single window and raise any existing ones
         if not self.window:
             # Windows are associated with the application
             # when the last one is closed the application shuts down
             self.window = HandyTaskAppWindow(application=self, title="Main Window")
+            self.window.set_size_request(1200,800)
+
+
 
         self.window.present()
 

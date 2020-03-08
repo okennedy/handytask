@@ -1,8 +1,47 @@
-from gi.repository import Gtk, Gio, GLib
+from gi.repository import Gtk, Gio, GLib, Handy
+
 
 from tasklib import TaskWarrior 
 from handytask.tasklist import TaskList
 import handytask.tasklist as tasklist
+
+class TaskListView(Gtk.ScrolledWindow):
+
+  def __init__(self, tasks, toggle, select, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.body = Gtk.TreeView()
+    self.body.set_model(tasks.model)
+    self.add(self.body)
+    self.body.show()
+
+    done_toggle_renderer = Gtk.CellRendererToggle()
+    done_toggle_renderer.connect("toggled", toggle)
+    self.body.append_column(
+      Gtk.TreeViewColumn("✓", done_toggle_renderer, active = tasklist.COMPLETED_COLUMN)
+    )
+
+    self.body.append_column(
+      Gtk.TreeViewColumn("Task", Gtk.CellRendererText(), text = tasklist.ELLIPSIZED_TITLE_COLUMN)
+    )
+
+    self.body.append_column(
+      Gtk.TreeViewColumn("Due", Gtk.CellRendererText(), text = tasklist.DUE_COLUMN)
+    )
+
+    self.body.append_column(
+      Gtk.TreeViewColumn("Urg.", Gtk.CellRendererText(), text = tasklist.URGENCY_COLUMN)
+    )
+
+class TaskDetailView(Gtk.Box):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, { "orientation" : Gtk.Orientation.VERTICAL, **kwargs })
+
+    # self.set_property("maximum-width", 100)
+
+    label = Gtk.Label("Detail")
+    self.pack_start(label, True, True, 0)
+    label.show()
 
 class HandyTaskAppWindow(Gtk.ApplicationWindow):
 
@@ -20,29 +59,27 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
                         lambda obj, pspec: max_action.set_state(
                                            GLib.Variant.new_boolean(obj.props.is_maximized)))
 
-    self.scroller = Gtk.ScrolledWindow()
-    self.add(self.scroller)
-    self.scroller.show()
-
     self.tasks = TaskList(taskwarrior = TaskWarrior())
-    self.task_view = Gtk.TreeView()
-    self.task_view.set_model(self.tasks.model)
-    self.scroller.add(self.task_view)
+
+    self.multi_view = Handy.Leaflet(orientation = Gtk.Orientation.HORIZONTAL)
+    self.add(self.multi_view)
+    self.multi_view.show()
+
+    self.task_view = TaskListView(
+      tasks = self.tasks, 
+      toggle = self.on_done_toggled,
+      select = self.on_select_task
+    )
+    self.multi_view.add(self.task_view)
     self.task_view.show()
 
-    done_toggle_renderer = Gtk.CellRendererToggle()
-    done_toggle_renderer.connect("toggled", self.on_done_toggled)
-    self.task_view.append_column(
-      Gtk.TreeViewColumn("✓", done_toggle_renderer, active = tasklist.COMPLETED_COLUMN)
-    )
+    self.detail_view = TaskDetailView()
+    self.multi_view.add(self.detail_view)
+    self.detail_view.show()
 
-    self.task_view.append_column(
-      Gtk.TreeViewColumn("Task", Gtk.CellRendererText(), text = tasklist.ELLIPSIZED_TITLE_COLUMN)
-    )
+  def on_select_task(select, action, value):
+    print("Select task: {}".format(value))
 
-    self.task_view.append_column(
-      Gtk.TreeViewColumn("Due", Gtk.CellRendererText(), text = tasklist.DUE_COLUMN)
-    )
 
   def on_done_toggled(self, action, value):
     self.tasks.toggle_done(int(value))

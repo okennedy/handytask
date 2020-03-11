@@ -1,6 +1,5 @@
 from gi.repository import Gtk, Gio, GLib, Handy
 
-
 from tasklib import TaskWarrior 
 from handytask.tasklist import TaskList
 import handytask.tasklist as tasklist
@@ -30,18 +29,84 @@ class TaskListView(Gtk.ScrolledWindow):
     )
 
     self.body.append_column(
-      Gtk.TreeViewColumn("Urg.", Gtk.CellRendererText(), text = tasklist.URGENCY_COLUMN)
+      Gtk.TreeViewColumn("🤯", Gtk.CellRendererText(), text = tasklist.URGENCY_COLUMN)
     )
+
+    # We want to be at least 600 pixels wide (-1 = no height minimum)
+    self.set_size_request(600, -1)
+    # If we have more space, please give it to us!
+    self.set_hexpand(True)
+
+    # Connect the selection callback if not none
+    if select is not None:
+      self.selection = self.body.get_selection()
+      self.selection.connect("changed", select)
+
+  def unselect(self):
+    self.selection.unselect_all()
+
+
 
 class TaskDetailView(Gtk.Box):
   def __init__(self, *args, **kwargs):
-    super().__init__(*args, { "orientation" : Gtk.Orientation.VERTICAL, **kwargs })
+    super().__init__(
+      orientation = Gtk.Orientation.VERTICAL, 
+      spacing = 10,
+      *args, **kwargs
+    )
 
-    # self.set_property("maximum-width", 100)
+    # We want to be at least 300 pixels wide (-1 = no height minimum)
+    self.set_size_request(300, -1)
 
-    label = Gtk.Label("Detail")
+    label = Gtk.Label("Task")
+    label.set_hexpand(True)
+    label.set_justify(Gtk.Justification.LEFT)
+    label.show()
+    self.pack_start(label, False, False, 0)
+    self.task_title = Gtk.Entry()
+    self.pack_start(self.task_title, False, False, 0)
+    self.task_title.show()
+
+    box = Gtk.Box()
+    box.show()
+    self.completed_check = Gtk.CheckButton()
+    self.completed_check.show()
+    box.pack_start(self.completed_check, False, False, 10)
+    label = Gtk.Label("Completed")
+    label.show()
+    box.pack_start(label, False, False, 0)
+    self.completed_date = Gtk.Label("")
+    self.completed_date.show()
+    box.pack_start(self.completed_date, True, True, 0)
+    self.completed_date.show()
+    self.pack_start(box, False, False, 0)
+
+    label = Gtk.Label("Due Date")
+    label.show()
+    self.pack_start(label, False, False, 0)
+    self.due_date = Gtk.Calendar()
+    self.due_date.show()
+    self.pack_start(self.due_date, False, False, 0)
+
+
+    label = Gtk.Label("Annotations")
     self.pack_start(label, True, True, 0)
     label.show()
+
+  def set_task(self, task):
+    self.task = task
+    self.task_title.set_text(task[tasklist.TITLE_COLUMN])
+    self.completed_check.set_active(task[tasklist.COMPLETED_COLUMN])
+    if task[tasklist.COMPLETED_COLUMN]:
+      self.completed_date.set_text("DUE?")
+    else:
+      self.completed_date.set_text("")
+    task = task[tasklist.TASK_COLUMN]
+    due = task["due"]
+    self.due_date.select_month(due.month-1, due.year)
+    self.due_date.select_day(due.day)
+
+
 
 class HandyTaskAppWindow(Gtk.ApplicationWindow):
 
@@ -59,12 +124,19 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
                         lambda obj, pspec: max_action.set_state(
                                            GLib.Variant.new_boolean(obj.props.is_maximized)))
 
+    # Allocate a universal taskwarrior instance
     self.tasks = TaskList(taskwarrior = TaskWarrior())
 
+    # Responsive Box -> Stack transition
+    # If there's enough width, we show the sidebar as a box (adjacent fields)
+    # If not (see set_size_request in each of the children), Handy.Leaflet
+    #   instead displays as a stack (one view at a time)
     self.multi_view = Handy.Leaflet(orientation = Gtk.Orientation.HORIZONTAL)
     self.add(self.multi_view)
     self.multi_view.show()
 
+    # Allocate the task list view itself
+    self.initial_selection = True
     self.task_view = TaskListView(
       tasks = self.tasks, 
       toggle = self.on_done_toggled,
@@ -73,12 +145,26 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     self.multi_view.add(self.task_view)
     self.task_view.show()
 
+    # Allocate the task detail sidebar
     self.detail_view = TaskDetailView()
     self.multi_view.add(self.detail_view)
+    # self.detail_view.hide()
     self.detail_view.show()
 
-  def on_select_task(select, action, value):
-    print("Select task: {}".format(value))
+    self.task_view.unselect()
+    # self.multi_view.set_visible_child(self.detail_view)
+
+  def on_select_task(self, selection):
+    if self.initial_selection:
+      self.task_view.unselect()
+      self.initial_selection = False
+    model, treeiter = selection.get_selected()
+    if treeiter is None:
+      self.multi_view.set_visible_child(self.task_view)
+    else:
+      task = model[treeiter]
+      self.detail_view.set_task(task)
+      self.multi_view.set_visible_child(self.detail_view)
 
 
   def on_done_toggled(self, action, value):

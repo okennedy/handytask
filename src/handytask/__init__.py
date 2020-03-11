@@ -62,9 +62,7 @@ class HandyTaskApplication(Gtk.Application):
             # Windows are associated with the application
             # when the last one is closed the application shuts down
             self.window = HandyTaskAppWindow(application=self, title="Main Window")
-            self.window.set_size_request(1200,800)
-
-
+            self.window.set_default_size(1200,800)
 
         self.window.present()
 

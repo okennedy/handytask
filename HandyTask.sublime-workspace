@@ -517,18 +517,6 @@
 			]
 		]
 	},
-	"buffers":
-	[
-		{
-			"file": "tasklist.py",
-			"settings":
-			{
-				"buffer_size": 2341,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		}
-	],
 	"build_system": "",
 	"build_system_choices":
 	[
@@ -967,14 +955,15 @@
 		"side_bar_visible": false,
 		"status_bar_visible": false
 	},
-	"expanded_folders":
-	[
-		"/home/okennedy/Documents/HandyTask",
-		"/home/okennedy/Documents/HandyTask/src",
-		"/home/okennedy/Documents/HandyTask/src/handytask"
-	],
 	"file_history":
 	[
+		"/home/okennedy/Documents/HandyTask/src/handytask/__init__.py",
+		"/home/okennedy/Documents/HandyTask/src/handytask/tasklist.py",
+		"/home/okennedy/Documents/HandyTask/src/handytask/window.py",
+		"/home/okennedy/Documents/Lib/libhandy/README.md",
+		"/home/okennedy/Documents/Lib/libhandy/HACKING.md",
+		"/home/okennedy/Documents/HandyTask/HandyTask.sublime-project",
+		"/usr/local/lib/python3.7/dist-packages/pygtkcompat/pygtkcompat.py",
 		"/home/okennedy/Documents/Mimir/Caveats/test_data/CPUSpeed.csv",
 		"/home/okennedy/Documents/Mimir/Caveats/src/test/scala/org/mimirdb/lenses/inference/InferTypesSpec.scala",
 		"/home/okennedy/Documents/Mimir/Caveats/src/main/scala/org/mimirdb/lenses/inference/InferTypes.scala",
@@ -1095,14 +1084,7 @@
 		"/home/okennedy/Documents/Caveats/src/main/scala/org/mimirdb/caveats/ExpressionDependency.scala",
 		"/home/okennedy/Documents/Caveats/src/test/scala/org/mimirdb/caveats/SharedSparkTestInstance.scala",
 		"/home/okennedy/Documents/Caveats/src/test/scala/org/mimirdb/caveats/ExpressionSpec.scala",
-		"/home/okennedy/Documents/Caveats/src/main/scala/org/mimirdb/caveats/implicits.scala",
-		"/home/okennedy/Documents/Caveats/src/main/scala/org/mimirdb/caveats/AnnotateExpression.scala",
-		"/home/okennedy/Documents/Caveats/DEVEL.md",
-		"/home/okennedy/Documents/Caveats/src/main/scala/org/mimirdb/spark/sparkWorkarounds.scala",
-		"/home/okennedy/Documents/Caveats/src/main/scala/org/mimirdb/spark/Snoup.scala",
-		"/home/okennedy/Documents/Websites/ODIn/slides/talks/2020-2-WorkingWithCSE/index.html",
-		"/home/okennedy/Documents/spark/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/expressions/complexTypeCreator.scala",
-		"/home/okennedy/Documents/spark/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/expressions/BoundAttribute.scala"
+		"/home/okennedy/Documents/Caveats/src/main/scala/org/mimirdb/caveats/implicits.scala"
 	],
 	"find":
 	{
@@ -1120,6 +1102,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"CellRenderer",
 			"Type",
 			"->",
 			"scala",
@@ -1142,48 +1125,6 @@
 		"whole_word": false,
 		"wrap": true
 	},
-	"groups":
-	[
-		{
-			"selected": 0,
-			"sheets":
-			[
-				{
-					"buffer": 0,
-					"file": "tasklist.py",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 2341,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								400,
-								400
-							]
-						],
-						"settings":
-						{
-							"incomplete_sync": null,
-							"remote_loading": false,
-							"synced": false,
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				}
-			]
-		}
-	],
 	"incremental_find":
 	{
 		"height": 33.0
@@ -1217,7 +1158,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 120.0
+		"height": 306.0
 	},
 	"output.find_results":
 	{
@@ -1243,8 +1184,7 @@
 	{
 		"height": 126.0
 	},
-	"pinned_build_system": "",
-	"project": "HandyTask.sublime-project",
+	"pinned_build_system": "Run in Python",
 	"replace":
 	{
 		"height": 62.0
@@ -1789,7 +1729,6 @@
 		],
 		"width": 592.0
 	},
-	"selected_group": 0,
 	"settings":
 	{
 	},

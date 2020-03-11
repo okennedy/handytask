@@ -12,6 +12,7 @@ PENDING_COLUMN          = 6
 ACTIVE_COLUMN           = 7
 TAGS_COLUMN             = 8
 URGENCY_COLUMN          = 9
+TASK_COLUMN             = 10
 
 def stringify_date(d, now = datetime.now()):
   if d == None:
@@ -33,22 +34,35 @@ def is_task_completed(task):
 
 def task_tuple(task):
   return [
-    task['uuid'],                                    # 0
-    str(task),                                       # 1
-    ellipsize(str(task)),                            # 2
-    task['status'],                                  # 3
-    stringify_date(task['due']),                     # 4
-    is_task_completed(task),                         # 5
-    task.pending,                                    # 6
-    task.active,                                     # 7
-    task["tags"],                                    # 8
+    task['uuid'],                                                       # 0
+    str(task),                                                          # 1
+    ellipsize(str(task)),                                               # 2
+    task['status'],                                                     # 3
+    stringify_date(task['due']),                                        # 4
+    is_task_completed(task),                                            # 5
+    task.pending,                                                       # 6
+    task.active,                                                        # 7
+    task["tags"],                                                       # 8
     str(int(float(task["urgency"])*100)/100.0) if task.pending else "", # 9
+    task
   ]
 
 class TaskList:
   def __init__(self, **kwargs):
     self.taskwarrior = kwargs["taskwarrior"]
-    self.model = Gtk.ListStore(str, str, str, str, str, bool, bool, bool, GObject.TYPE_PYOBJECT, str)
+    self.model = Gtk.ListStore(
+      str, 
+      str, 
+      str, 
+      str, 
+      str, 
+      bool, 
+      bool, 
+      bool, 
+      GObject.TYPE_PYOBJECT, 
+      str,
+      GObject.TYPE_PYOBJECT, 
+    )
     self.refresh( )
 
 
@@ -70,7 +84,8 @@ class TaskList:
 
     self.model.clear()
     for task in self.tasks:
-      print("{} -- {} ({}; {})".format("✓" if task.pending else "x", task, task["end"] or task["urgency"], ",".join(task["tags"])))
+      # print("{} -- {} ({}; {})".format("✓" if task.pending else "x", task, task["end"] or task["urgency"], ",".join(task["tags"])))
+      # print(task["annotations"])
       self.model.append(task_tuple(task))
 
   def __getitem__(self, idx):

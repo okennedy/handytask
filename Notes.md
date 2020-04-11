@@ -3,7 +3,7 @@
 ### Setting up LibHandy
 As of writing, PureOS desktop packages only LibHandy v0, while the current version is 1.  That means you will, in all likelihood, need to build and compile it yourself.  The repository, with instructions is [here](https://source.puri.sm/Librem5/libhandy).  
 
-It's worth noting that the LibHandy build installer (i.e., `ninja -C _build install`) sets up the libraries, but does not seem to configure all of the GTK metadata properly.  The LibHandy build script does provide a convenient script to run a command with all of the metadata variables set correctly (`libhandy/_build/run` if you follow the suggested build instructions).  As a convenience, I found it useful to set the same environment variables in my .profile.  e.g., (make sure to change the first two path variables appropriately if you use this code yourself:
+It's worth noting that the LibHandy build installer (i.e., `ninja -C _build install`) sets up the libraries, but does not seem to configure all of the GTK metadata properly.  The LibHandy build script does provide a convenient script to run a command with relevant environment variables set (`libhandy/_build/run` if you follow the suggested build instructions).  As a convenience, I found it useful to set the same environment variables in my .profile.  e.g., (make sure to change the first two path variables appropriately if you use this code yourself:
 
 ```
 LIBHANDY_BUILDDIR='/home/okennedy/Documents/Lib/libhandy/_build'

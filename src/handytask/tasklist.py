@@ -1,6 +1,7 @@
 from gi.repository import Gtk, GObject
 from datetime import datetime, timedelta
 from tzlocal import get_localzone
+from tasklib import Task
 
 UUID_COLUMN             = 0
 TITLE_COLUMN            = 1
@@ -44,7 +45,7 @@ def task_tuple(task):
     task.active,                                                        # 7
     task["tags"],                                                       # 8
     str(int(float(task["urgency"])*100)/100.0) if task.pending else "", # 9
-    task
+    task                                                                # 10
   ]
 
 class TaskList:
@@ -94,7 +95,17 @@ class TaskList:
   def commit(self, idx):
     task = self[idx]
     task.save()
-    self.model[idx] = task_tuple(task)
+    updated = task_tuple(task)
+    self.model[idx] = updated
+    return updated
+
+  def add(self, task):
+    self.tasks.append(task)
+    task.save()
+    created = task_tuple(task)
+    self.model.append(created)
+    assert(len(self.model) == len(self.tasks))
+    return created
 
   def toggle_done(self, idx):
     task = self[idx]
@@ -105,3 +116,36 @@ class TaskList:
       print("Completing task "+task["uuid"])
       task.done()
     self.commit(idx)
+
+  def index_of_task(self, task_row):
+    uuid = task_row[UUID_COLUMN]
+    for idx, row in enumerate(self.model):
+      if row[UUID_COLUMN] == uuid:
+        return idx
+    return None
+
+  def update( self,
+              idx, 
+              description = None,
+              completed = None,
+              due = None
+            ):
+    if idx is None:
+      task = Task(self.taskwarrior)
+    else:
+      task = self[idx]
+    if description is not None:
+      task["description"] = description
+    if completed is not None:
+      if is_task_completed(task):
+        if not completed:
+          task["status"] = "pending"
+      else:
+        if completed:
+          task.done()
+    if due is not None:
+      task["due"] = due
+    if idx is None:
+      return self.add(task)
+    else:
+      return self.commit(idx)

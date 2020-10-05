@@ -21,9 +21,11 @@ class TaskListView(Gtk.ScrolledWindow):
       Gtk.TreeViewColumn("✓", done_toggle_renderer, active = tasklist.COMPLETED_COLUMN)
     )
 
-    self.body.append_column(
-      Gtk.TreeViewColumn("Task", Gtk.CellRendererText(), text = tasklist.ELLIPSIZED_TITLE_COLUMN)
-    )
+    task_column = Gtk.TreeViewColumn("Task", Gtk.CellRendererText(), text = tasklist.ELLIPSIZED_TITLE_COLUMN)
+    task_column.set_fixed_width(150)
+    # task_column.set_max_width(300)
+    task_column.set_expand(True)
+    self.body.append_column(task_column)
 
     self.body.append_column(
       Gtk.TreeViewColumn("Due", Gtk.CellRendererText(), text = tasklist.DUE_COLUMN)
@@ -34,7 +36,7 @@ class TaskListView(Gtk.ScrolledWindow):
     )
 
     # We want to be at least 600 pixels wide (-1 = no height minimum)
-    self.set_size_request(600, -1)
+    self.set_size_request(200, -1)
     # If we have more space, please give it to us!
     self.set_hexpand(True)
 

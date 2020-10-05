@@ -67,7 +67,7 @@ class TaskList:
     self.refresh( )
 
 
-  def refresh(self, limit = default_limit(), **kwargs):
+  def refresh(self, limit = default_limit(), include_recurring = False, **kwargs):
     """Refresh the model contents. 
        Arguments are passed directly to taskwarrior.tasks.filter
     """
@@ -76,12 +76,21 @@ class TaskList:
     else:
       self.tasks = self.taskwarrior.tasks.all()
 
+    if not include_recurring: 
+      self.tasks = [
+        task
+        for task in self.tasks
+        if task["status"] != "recurring"
+      ]
+
     if limit is not None:# and False:
       self.tasks = [
         task
         for task in self.tasks
-        if (task["end"] == None) or (task["end"] > limit)
+        if ((task["end"] == None) or (task["end"] > limit))
       ]
+
+    self.tasks.sort(key = lambda task: -task["urgency"] if task["urgency"] is not None and task["status"] == "pending" else 0)
 
     self.model.clear()
     for task in self.tasks:

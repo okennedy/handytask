@@ -21,4 +21,5 @@ export PKG_CONFIG_PATH="${LIBHANDY_BUILDDIR}/src:$PKG_CONFIG_PATH"
 - [PyGObject Docs](https://pygobject.readthedocs.io/en/latest/)
 - [TaskLib Documentation](https://tasklib.readthedocs.io/)
 - [LibHandy Tutorial](https://tuxphones.com/tutorial-developing-responsive-linux-smartphone-apps-libhandy-gtk-part-1/)
-- [LibHandy Manual](https://developer.puri.sm/projects/libhandy/unstable/index.html)
+- [LibHandy Manual](https://gnome.pages.gitlab.gnome.org/libhandy/)
+- [List of Icon Labels](http://dl.0xdeadc0de.fr/misc/gtkiconview_freedesktop.py)

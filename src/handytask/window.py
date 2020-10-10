@@ -132,8 +132,13 @@ class TaskDetailView(Gtk.Box):
       self.completed_date.set_text("")
     task = task[tasklist.TASK_COLUMN]
     due = task["due"]
-    self.due_date.select_month(due.month-1, due.year)
-    self.due_date.select_day(due.day)
+    if due is not None:
+      self.due_date.select_month(due.month-1, due.year)
+      self.due_date.select_day(due.day)
+    else:
+      today = datetime.now()
+      self.due_date.select_month(today.month-1, today.year)
+      self.due_date.select_day(today.day)
     self.save_button.set_label("Save")
 
   def reset_task(self):
@@ -167,15 +172,36 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     super().__init__(*args, **kwargs)
 
     # This will be in the windows group and have the "win" prefix
-    max_action = Gio.SimpleAction.new_stateful("maximize", None,
-                                       GLib.Variant.new_boolean(False))
-    max_action.connect("change-state", self.on_maximize_toggle)
-    self.add_action(max_action)
+    # max_action = Gio.SimpleAction.new_stateful("maximize", None,
+    #                                    GLib.Variant.new_boolean(False))
+    # max_action.connect("change-state", self.on_maximize_toggle)
+    # self.add_action(max_action)
+
+    self.header = Handy.HeaderBar()
+    self.header.set_title("HandyTask")
+    self.back_button = Gtk.Button.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON)
+    # self.back_button.set_label("<")
+    # self.back_button.set_image(
+    #   Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON)
+    # )
+    self.back_button.connect("clicked", self.on_detail_cancel_clicked)
+    self.header.pack_start(self.back_button)
+    # self.back_button.show()
+
+    # self.refresh_button = Gtk.ToolButton()
+    # self.refresh_button.set_icon_name("view-refresh")
+    self.refresh_button = Gtk.Button.new_from_icon_name("view-refresh", Gtk.IconSize.BUTTON)
+    self.refresh_button.show()
+    self.refresh_button.connect("clicked", self.on_refresh_clicked)
+    self.header.pack_end(self.refresh_button)
+
+    self.set_titlebar(self.header)
+    self.header.show()
 
     # Keep it in sync with the actual state
-    self.connect("notify::is-maximized",
-                        lambda obj, pspec: max_action.set_state(
-                                           GLib.Variant.new_boolean(obj.props.is_maximized)))
+    # self.connect("notify::is-maximized",
+    #                     lambda obj, pspec: max_action.set_state(
+    #                                        GLib.Variant.new_boolean(obj.props.is_maximized)))
 
     # Allocate a universal taskwarrior instance
     self.tasks = TaskList(taskwarrior = TaskWarrior())
@@ -214,10 +240,16 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     self.task_view.unselect()
     self.detail_view.clear_task()
     self.multi_view.set_visible_child(self.task_view)
+    self.back_button.hide()
 
   def show_task_view(self, task):
-    self.detail_view.set_task(task)
-    self.multi_view.set_visible_child(self.detail_view)
+    # print("Showing task: {}".format(task))
+    if task is None:
+      self.show_default_view()
+    else:
+      self.detail_view.set_task(task)
+      self.multi_view.set_visible_child(self.detail_view)
+      self.back_button.show()
 
   def on_select_task(self, selection):
     if self.initial_selection:
@@ -246,3 +278,7 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
   def on_detail_save_clicked(self, button):
     self.detail_view.save_task(self.tasks)
     self.show_default_view()
+    self.tasks.sync()
+
+  def on_refresh_clicked(self, button):
+    self.tasks.refresh(sync = True)

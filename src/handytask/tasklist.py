@@ -67,10 +67,18 @@ class TaskList:
     self.refresh( )
 
 
-  def refresh(self, limit = default_limit(), include_recurring = False, **kwargs):
+  def refresh(self, 
+      limit = default_limit(), 
+      include_recurring = False, 
+      sync = False,
+      **kwargs
+    ):
     """Refresh the model contents. 
        Arguments are passed directly to taskwarrior.tasks.filter
     """
+    if sync:
+      self.sync()
+
     if kwargs:
       self.tasks = self.taskwarrior.tasks.filter(**kwargs)
     else:
@@ -158,3 +166,6 @@ class TaskList:
       return self.add(task)
     else:
       return self.commit(idx)
+
+  def sync(self):
+    self.taskwarrior.sync()

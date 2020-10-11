@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=HandyTask
-Exec=python3 /home/mobian/Documents/HandyTask/main.py
-Path=/home/mobian/Documents/HandyTask/
-StartupNotify=true
-Terminal=false
-Type=Application
-Categories=GNOME;GTK;
-Icon=/home/mobian/Documents/HandyTask/Taskwarrior_logo.png

@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"detail",
+				"detail_view"
+			],
+			[
+				"on",
+				"on_update_date"
+			],
+			[
+				"on_",
+				"on_done_toggled"
+			],
+			[
 				"header",
 				"headerTypeViolations"
 			],
@@ -86,10 +98,6 @@
 			[
 				"INTE",
 				"INTENT_NOT_RECOGNIZED"
-			],
-			[
-				"on",
-				"on_message"
 			],
 			[
 				"string",
@@ -506,14 +514,6 @@
 			[
 				"Short",
 				"ShortcutCompiler"
-			],
-			[
-				"Ag",
-				"AggFunction"
-			],
-			[
-				"At",
-				"AttributeSeq"
 			]
 		]
 	},
@@ -957,9 +957,9 @@
 	},
 	"file_history":
 	[
+		"/home/okennedy/Documents/HandyTask/src/handytask/window.py",
 		"/home/okennedy/Documents/HandyTask/src/handytask/__init__.py",
 		"/home/okennedy/Documents/HandyTask/src/handytask/tasklist.py",
-		"/home/okennedy/Documents/HandyTask/src/handytask/window.py",
 		"/home/okennedy/Documents/Lib/libhandy/README.md",
 		"/home/okennedy/Documents/Lib/libhandy/HACKING.md",
 		"/home/okennedy/Documents/HandyTask/HandyTask.sublime-project",
@@ -1088,7 +1088,7 @@
 	],
 	"find":
 	{
-		"height": 39.0
+		"height": 49.0
 	},
 	"find_in_files":
 	{
@@ -1127,7 +1127,7 @@
 	},
 	"incremental_find":
 	{
-		"height": 33.0
+		"height": 37.0
 	},
 	"input":
 	{
@@ -1187,7 +1187,7 @@
 	"pinned_build_system": "Run in Python",
 	"replace":
 	{
-		"height": 62.0
+		"height": 70.0
 	},
 	"save_all_on_build": true,
 	"select_file":

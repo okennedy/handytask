@@ -2,12 +2,13 @@ from gi.repository import Gtk, Gio, GLib, Handy
 
 from tasklib import TaskWarrior 
 from handytask.tasklist import TaskList
+from datetime import datetime
 import handytask.tasklist as tasklist
 from datetime import datetime
 
 class TaskListView(Gtk.ScrolledWindow):
 
-  def __init__(self, tasks, toggle, select, *args, **kwargs):
+  def __init__(self, tasks, toggle, on_select, *args, **kwargs):
     super().__init__(*args, **kwargs)
 
     self.body = Gtk.TreeView()
@@ -41,17 +42,20 @@ class TaskListView(Gtk.ScrolledWindow):
     self.set_hexpand(True)
 
     # Connect the selection callback if not none
-    if select is not None:
+    if on_select is not None:
       self.selection = self.body.get_selection()
-      self.selection.connect("changed", select)
+      self.selection.connect("changed", on_select)
 
   def unselect(self):
     self.selection.unselect_all()
 
+  def refresh(tasks):
+    print(tasks)
+    self.body.set_model(tasks.model)
 
 
 class TaskDetailView(Gtk.Box):
-  def __init__(self, on_save, on_cancel, *args, **kwargs):
+  def __init__(self, on_save, on_cancel, on_update_date, *args, **kwargs):
     super().__init__(
       orientation = Gtk.Orientation.VERTICAL, 
       spacing = 10,
@@ -59,6 +63,7 @@ class TaskDetailView(Gtk.Box):
     )
 
     self.task = None
+    self.silence_updates = True
 
     # We want to be at least 300 pixels wide (-1 = no height minimum)
     self.set_size_request(300, -1)
@@ -90,6 +95,8 @@ class TaskDetailView(Gtk.Box):
     label.show()
     self.pack_start(label, False, False, 0)
     self.due_date = Gtk.Calendar()
+    self.on_update_date = on_update_date
+    self.due_date.connect("day-selected", self.handle_update_date)
     self.due_date.show()
     self.pack_start(self.due_date, False, False, 0)
 
@@ -112,6 +119,7 @@ class TaskDetailView(Gtk.Box):
     button.show()
     self.pack_start(box, False, False, 0)
     self.clear_task()
+    self.silence_updates = False
 
   def clear_task(self):
     self.task = None
@@ -122,7 +130,9 @@ class TaskDetailView(Gtk.Box):
     self.due_date.select_day(today.day)
     self.save_button.set_label("Create")
 
+
   def set_task(self, task):
+    self.silence_updates = True
     self.task = task
     self.task_title.set_text(task[tasklist.TITLE_COLUMN])
     self.completed_check.set_active(task[tasklist.COMPLETED_COLUMN])
@@ -139,6 +149,7 @@ class TaskDetailView(Gtk.Box):
       today = datetime.now()
       self.due_date.select_month(today.month-1, today.year)
       self.due_date.select_day(today.day)
+    self.silence_updates = False
     self.save_button.set_label("Save")
 
   def reset_task(self):
@@ -164,6 +175,16 @@ class TaskDetailView(Gtk.Box):
       completed = self.completed_check.get_active(),
       due = self.selected_due_date()
     )
+
+  def get_task(self):
+    if self.task is None: 
+      return None
+    return self.task[tasklist.TASK_COLUMN]
+
+  def handle_update_date(self, calendar):
+    if not self.silence_updates:
+      if self.on_update_date is not None:
+        self.on_update_date(calendar)
 
 
 class HandyTaskAppWindow(Gtk.ApplicationWindow):
@@ -197,6 +218,8 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
 
     self.set_titlebar(self.header)
     self.header.show()
+    self.set_show_menubar(False)
+
 
     # Keep it in sync with the actual state
     # self.connect("notify::is-maximized",
@@ -219,7 +242,7 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     self.task_view = TaskListView(
       tasks = self.tasks, 
       toggle = self.on_done_toggled,
-      select = self.on_select_task
+      on_select = self.on_select_task
     )
     self.multi_view.add(self.task_view)
     self.task_view.show()
@@ -227,7 +250,8 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     # Allocate the task detail sidebar
     self.detail_view = TaskDetailView(
       on_save = self.on_detail_save_clicked,
-      on_cancel = self.on_detail_cancel_clicked
+      on_cancel = self.on_detail_cancel_clicked,
+      on_update_date = self.on_update_date
     )
     self.multi_view.add(self.detail_view)
     # self.detail_view.hide()
@@ -264,6 +288,29 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
 
   def on_done_toggled(self, action, value):
     self.tasks.toggle_done(int(value))
+
+  def on_update_date(self, due_date_calendar):
+    date = due_date_calendar.get_date()
+    print(date)
+    date = datetime(
+      year = date.year,
+      month = date.month+1,
+      day = date.day,
+      hour = 17
+    )
+    task = self.detail_view.get_task()
+    if task is not None:
+      if(task['due'] != date):
+        task['due'] = date
+        task.save()
+        self.refresh()
+        print(date)
+      else:
+        print("SAME")
+
+  def refresh(self):
+    self.tasks.refresh()
+    # self.task_view.refresh(self.tasks)
 
   def on_maximize_toggle(self, action, value):
       action.set_state(value)

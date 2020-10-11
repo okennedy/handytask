@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "$1" ] ; then
+  export GI_TYPELIB_PATH=$1
+fi
+
+/home/okennedy/.pyenv/shims/python3 main.py

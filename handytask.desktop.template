@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=HandyTask
+Exec=%%exec_cmd%%
+Path=%%working_directory%%
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;
+Icon=%%icon_path%%

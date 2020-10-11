@@ -14,9 +14,9 @@ else
   EXEC_CMD="$EXEC_CMD \"\""
 fi
 
-#pip3 install --user -r requirements.txt
+pip3 install --user -r requirements.txt
 
-#install -D images/taskwarrior.png $ICON_PATH
+install -D images/taskwarrior.png $ICON_PATH
 
 cat handytask.desktop.template | \
   sed "s#%%exec_cmd%%#$EXEC_CMD#g" | \

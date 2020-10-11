@@ -1,10 +1,10 @@
-from gi.repository import Gtk, Gio, GLib, Handy
+from gi.repository import Gtk, Handy
 
-from tasklib import TaskWarrior 
+from tasklib import TaskWarrior
 from handytask.tasklist import TaskList
 from datetime import datetime
 import handytask.tasklist as tasklist
-from datetime import datetime
+
 
 class TaskListView(Gtk.ScrolledWindow):
 
@@ -49,8 +49,7 @@ class TaskListView(Gtk.ScrolledWindow):
   def unselect(self):
     self.selection.unselect_all()
 
-  def refresh(tasks):
-    print(tasks)
+  def refresh(self, tasks):
     self.body.set_model(tasks.model)
 
 
@@ -191,6 +190,9 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
+
+    self.set_icon_from_file("images/taskwarrior.png")
+    self.set_wmclass("HandyTask", "HandyTask")
 
     # This will be in the windows group and have the "win" prefix
     # max_action = Gio.SimpleAction.new_stateful("maximize", None,

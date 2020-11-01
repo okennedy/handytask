@@ -1,4 +1,4 @@
-from gi.repository import Gtk, Handy
+from gi.repository import Gtk, Handy, GObject
 
 from tasklib import TaskWarrior
 from datetime import datetime
@@ -75,6 +75,18 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     self.multi_view.add(self.task_view)
     self.task_view.show()
 
+    self.multi_view.bind_property(
+      "folded", 
+      self.back_button, "visible",
+      GObject.BindingFlags.SYNC_CREATE
+    )
+
+    self.multi_view.bind_property(
+      "folded", 
+      self.new_button, "visible",
+      GObject.BindingFlags.SYNC_CREATE
+    )
+
     # Allocate the task detail sidebar
     self.detail_view = TaskDetailView(
       on_save = self.on_detail_save_clicked,
@@ -92,7 +104,7 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     self.task_view.unselect()
     self.detail_view.clear_task()
     self.multi_view.set_visible_child(self.task_view)
-    self.back_button.hide()
+    # self.back_button.set_enabled(False)
 
   def show_task_view(self, task):
     # print("Showing task: {}".format(task))
@@ -101,7 +113,7 @@ class HandyTaskAppWindow(Gtk.ApplicationWindow):
     else:
       self.detail_view.set_task(task)
     self.multi_view.set_visible_child(self.detail_view)
-    self.back_button.show()
+    # self.back_button.set_enabled(True)
 
   def on_new_clicked(self, button):
     self.task_view.unselect()
